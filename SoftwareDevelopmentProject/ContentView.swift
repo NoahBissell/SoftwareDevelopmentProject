@@ -8,12 +8,16 @@
 import SwiftUI
 
 struct ContentView: View {
+    
     var body: some View {
         HStack{
             Text("Test")
                 .padding()
             Text("Test")
                 .padding()
+            Spacer()
+            Image("food").resizable().padding(.trailing, 5.0)
+            
         }
         
     }
