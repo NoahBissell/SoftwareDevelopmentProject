@@ -14,6 +14,7 @@ struct AddProductView: View {
     
     @EnvironmentObject var kitchen : Kitchen
     @State var product : Product = Product()
+//    @State var classification : Classification = Classification(cleanTitle: "none", category: "none", breadcrumbs: [String]())
     
     @State var scannedCode = "0000"
     @State var isPresentingScanner = false
@@ -30,6 +31,9 @@ struct AddProductView: View {
                     BarcodeSearch().getProduct(upc: scannedCode) { product in
                         self.product = product
                     }
+                    FetchData().classifyProduct(product: product) { classification in
+                        product.classification = classification
+                    }
                 }
             })
     }
@@ -38,6 +42,12 @@ struct AddProductView: View {
         NavigationView{
             VStack{
                 Text("Product: \(product.title)")
+                if let unwrappedClassification = product.classification{
+                    Text("Title: \(unwrappedClassification.cleanTitle)")
+                    Text("Category: \(unwrappedClassification.category)")
+                    Text("Breadcrumbs: \(unwrappedClassification.breadcrumbs[0])")
+                }
+                
                 Button("Scan from barcode"){
                     self.isPresentingScanner = true
                 }
@@ -51,11 +61,16 @@ struct AddProductView: View {
                     kitchen.addProduct(product: product)
                     self.presentationMode.wrappedValue.dismiss()
                 }, label: {
-                    Text("Add")
+                    Text("Add product")
                 })
                 
             }
         }
+//        .onAppear {
+//            FetchData().classifyProduct(product: Product(id: 0, title: "Kroger Vitamin A & D Reduced Fat 2% Milk"), completion: { classification in
+//                self.classification = classification
+//            })
+//        }
     }
 }
 

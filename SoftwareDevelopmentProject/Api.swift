@@ -22,9 +22,47 @@ class FetchData : ObservableObject {
             }
         }.resume()
     }
+    
+    func classifyProduct(product : Product, completion: @escaping (Classification) -> ()) {
+        // If you encounter errors, it might be a problem with passing in a product object and not just a wrapped string
+        guard let encoded = try? JSONEncoder().encode(StringObject(title: product.title)) else {
+            print("Failed 1")
+            return
+        }
+
+        guard let url = URL(string: "https://api.spoonacular.com/food/products/classify?apiKey=dc7b6320294946cc8ef2be70d8e98db3&locale=en_US") else {
+            print("Failed 2")
+            return
+        }
+        var request = URLRequest(url: url)
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpMethod = "POST"
+        
+        
+        URLSession.shared.uploadTask(with: request, from: encoded) { (data, response, errors) in
+            guard let data = data else {
+                print("Failed 3")
+                return
+            }
+            let decoder = JSONDecoder()
+            if let response = try? decoder.decode(Classification.self, from: data){
+                DispatchQueue.main.async {
+                    completion(response)
+                }
+            }
+        }.resume()
+    }
 }
 
+struct StringObject : Codable {
+    var title : String
+}
 
+struct Classification : Codable {
+    var cleanTitle : String
+    var category : String
+    var breadcrumbs : [String]
+}
 
 struct Result : Codable {
     var title : String?
@@ -64,18 +102,17 @@ class BarcodeSearch : ObservableObject {
 }
 
 struct Product : Codable, Identifiable {
-    var id : Int
+    var id : Int = 0
     var aisle : String?
-    var title : String
+    var title : String = "Apples"
     
-    init(title : String = "Apple", id : Int = 0){
-        self.title = title
-        self.id = id
-    }
+    // from classification
+    var classification : Classification?
+    
 }
 
 class Kitchen : ObservableObject {
-// ALL POSSIBLE CATEGORIES (if we want to sort them later)
+// ALL POSSIBLE AISLES (if we want to sort them later)
     
 //    Baking
 //    Health Foods
