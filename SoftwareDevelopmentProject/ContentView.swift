@@ -8,17 +8,25 @@
 import SwiftUI
 
 struct ContentView: View {
+
+    @StateObject var kitchen = Kitchen(products: [Product(), Product()])
     
-    var body: some View {
-        HStack{
-            Text("Test")
-                .padding()
-            Text("Test")
-                .padding()
-            Spacer()
-            Image("food").resizable().padding(.trailing, 5.0)
+    var body : some View {
+        
+        
+        TabView{
             
+            KitchenView()
+                .tabItem(){
+                    Text("Kitchen")
+                }
+            
+            RecipeView(kitchen: kitchen)
+                .tabItem(){
+                    Text("Recipes")
+                }
         }
+        .environmentObject(kitchen)
         
     }
 }
