@@ -8,16 +8,21 @@
 import SwiftUI
 import CodeScanner
 import AVFoundation
+import struct Kingfisher.KFImage
 
 struct AddProductView: View {
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     
-    @EnvironmentObject var kitchen : Kitchen
+    @ObservedObject var kitchen : Kitchen
     @State var product : Product = Product()
-//    @State var classification : Classification = Classification(cleanTitle: "none", category: "none", breadcrumbs: [String]())
+    //    @State var classification : Classification = Classification(cleanTitle: "none", category: "none", breadcrumbs: [String]())
     
     @State var scannedCode = "0000"
     @State var isPresentingScanner = false
+    @State var isPresentingSearch = false
+    @State var query : String = ""
+    @State var searchedProductList = [ProductResult]()
+    
     
     var scannerSheet : some View {
         CodeScannerView(
@@ -28,7 +33,7 @@ struct AddProductView: View {
                     
                     // convert EAN13 to UPC
                     self.scannedCode.removeFirst()
-                    BarcodeSearch().getProduct(upc: scannedCode) { product in
+                    FetchData().getProductFromUPC(upc: scannedCode) { product in
                         self.product = product
                     }
                     FetchData().classifyProduct(product: product) { classification in
@@ -38,9 +43,45 @@ struct AddProductView: View {
             })
     }
     
+    var searchSheet : some View {
+        
+        VStack{
+            Spacer()
+            
+            // For some reason the keyboard dismisses after typing the first character, can't seem to figure out why
+            Form{
+                Section{
+                    TextField(
+                        "Search all recipes",
+                        text: $query)
+                    
+                    if(query.count > 0){
+                        Button("Search"){
+                            FetchData().searchProducts(query: query) { productList in
+                                self.searchedProductList = productList
+                            }
+                        }
+                    }
+                }
+                Section{
+                    List(searchedProductList){ productResult in
+                        Button(productResult.title ?? "Error Loading Product"){
+                            FetchData().getProductFromId(id: productResult.id) { product in
+                                self.product = product
+                            }
+                            self.isPresentingSearch = false
+                        }
+                    }
+                }
+            }
+            
+        }
+    }
+    
+    
     var body: some View {
         NavigationView{
-            VStack{
+            VStack(spacing: 20){
                 Text("Product: \(product.title)")
                 if let unwrappedClassification = product.classification{
                     Text("Title: \(unwrappedClassification.cleanTitle)")
@@ -55,6 +96,13 @@ struct AddProductView: View {
                     scannerSheet
                 }
                 
+                Button("Search for a product"){
+                    self.isPresentingSearch = true
+                }
+                .sheet(isPresented: $isPresentingSearch){
+                    searchSheet
+                }
+                
             }
             .toolbar {
                 Button (action: {
@@ -66,17 +114,13 @@ struct AddProductView: View {
                 
             }
         }
-//        .onAppear {
-//            FetchData().classifyProduct(product: Product(id: 0, title: "Kroger Vitamin A & D Reduced Fat 2% Milk"), completion: { classification in
-//                self.classification = classification
-//            })
-//        }
+        
     }
 }
 
 
 struct AddProductView_Previews: PreviewProvider {
     static var previews: some View {
-        AddProductView()
+        AddProductView(kitchen: Kitchen())
     }
 }

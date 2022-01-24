@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct KitchenView: View {
-    @EnvironmentObject var kitchen : Kitchen
+    @ObservedObject var kitchen : Kitchen
     @State var isPresentingAddProduct : Bool = false
     
     func delete(at offsets: IndexSet){
@@ -28,14 +28,6 @@ struct KitchenView: View {
                                     label: {
                                     ProductDetail(product: product)
                                 })
-                                
-//                                if let unwrappedClassification = product.classification
-//                                {
-//                                    Text(unwrappedClassification.category)
-//                                }
-//                                else{
-//                                    Text(product.aisle ?? product.title)
-//                                }
                             }
                             .onDelete(perform: delete)
                         }
@@ -46,17 +38,17 @@ struct KitchenView: View {
             }
             .navigationTitle("My Kitchen")
             .toolbar {
-                NavigationLink(destination: AddProductView()) {
+                NavigationLink(destination: AddProductView(kitchen: kitchen)) {
                     Image(systemName: "plus")
                 }
                 
             }
-        }.environmentObject(kitchen)
+        }
     }
 }
 
 struct KitchenView_Previews: PreviewProvider {
     static var previews: some View {
-        KitchenView()
+        KitchenView(kitchen: Kitchen())
     }
 }

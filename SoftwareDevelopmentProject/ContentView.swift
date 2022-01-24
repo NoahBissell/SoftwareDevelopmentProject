@@ -16,7 +16,7 @@ struct ContentView: View {
         
         TabView{
             
-            KitchenView()
+            KitchenView(kitchen: kitchen)
                 .tabItem(){
                     Text("Kitchen")
                 }
@@ -26,7 +26,7 @@ struct ContentView: View {
                     Text("Recipes")
                 }
         }
-        .environmentObject(kitchen)
+        
         
     }
 }

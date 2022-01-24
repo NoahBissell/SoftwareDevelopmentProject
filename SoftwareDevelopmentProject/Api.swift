@@ -8,14 +8,14 @@ import Foundation
 
 class FetchData : ObservableObject {
     
-    func getRecipes(completion: @escaping ([Result]) -> ()) {
+    func getRecipes(completion: @escaping ([RecipeResult]) -> ()) {
         guard let url = URL(string: "https://api.spoonacular.com/recipes/complexSearch?apiKey=dc7b6320294946cc8ef2be70d8e98db3") else {return}
         
         URLSession.shared.dataTask(with: url) { (data, response, errors) in
             guard let data = data else {return}
             
             let decoder = JSONDecoder()
-            if let response = try? decoder.decode(Response.self, from: data){
+            if let response = try? decoder.decode(RecipeResponse.self, from: data){
                 DispatchQueue.main.async {
                     completion(response.results)
                 }
@@ -52,40 +52,23 @@ class FetchData : ObservableObject {
             }
         }.resume()
     }
-}
-
-struct StringObject : Codable {
-    var title : String
-}
-
-struct Classification : Codable {
-    var cleanTitle : String
-    var category : String
-    var breadcrumbs : [String]
-}
-
-struct Result : Codable {
-    var title : String?
-}
-
-struct Response : Codable {
-    var results : [Result] = [Result]()
-}
-
-extension Result : Identifiable {
-    var id: String {
-        if let test = title {
-            return test
-        }
-        else{
-            return ""
-        }
-    }
-}
-
-class BarcodeSearch : ObservableObject {
     
-    func getProduct(upc : String, completion: @escaping (Product) -> ()) {
+    func searchProducts(query : String, completion: @escaping ([ProductResult]) -> ()){
+        guard let url = URL(string: "https://api.spoonacular.com/food/products/search?apiKey=dc7b6320294946cc8ef2be70d8e98db3&query=\(query)") else {return}
+        
+        URLSession.shared.dataTask(with: url) { (data, response, errors) in
+            guard let data = data else {return}
+            
+            let decoder = JSONDecoder()
+            if let response = try? decoder.decode(ProductResponse.self, from: data){
+                DispatchQueue.main.async {
+                    completion(response.products)
+                }
+            }
+        }.resume()
+    }
+    
+    func getProductFromUPC(upc : String, completion: @escaping (Product) -> ()) {
         guard let url = URL(string: "https://api.spoonacular.com/food/products/upc/\(upc)?apiKey=dc7b6320294946cc8ef2be70d8e98db3") else {return}
         
         URLSession.shared.dataTask(with: url) { (data, response, errors) in
@@ -99,6 +82,49 @@ class BarcodeSearch : ObservableObject {
             }
         }.resume()
     }
+    
+    func getProductFromId(id : Int, completion : @escaping (Product) -> ()){
+        guard let url = URL(string: "https://api.spoonacular.com/food/products/\(id)?apiKey=dc7b6320294946cc8ef2be70d8e98db3") else {return}
+        
+        URLSession.shared.dataTask(with: url) { (data, response, errors) in
+            guard let data = data else {return}
+            
+            let decoder = JSONDecoder()
+            if let product = try? decoder.decode(Product.self, from: data){
+                DispatchQueue.main.async {
+                    completion(product)
+                }
+            }
+        }.resume()
+    }
+}
+
+struct StringObject : Codable {
+    var title : String
+}
+
+struct Classification : Codable {
+    var cleanTitle : String
+    var category : String
+    var breadcrumbs : [String]
+}
+
+struct RecipeResult : Codable, Identifiable {
+    var title : String?
+    var id : Int = 0
+}
+
+struct RecipeResponse : Codable {
+    var results : [RecipeResult] = [RecipeResult]()
+}
+
+struct ProductResult : Codable, Identifiable {
+    var title : String?
+    var id : Int = 0
+}
+
+struct ProductResponse : Codable {
+    var products : [ProductResult] = [ProductResult]()
 }
 
 struct Product : Codable, Identifiable {
@@ -157,6 +183,3 @@ class Kitchen : ObservableObject {
         products.append(product)
     }
 }
-
-
-
