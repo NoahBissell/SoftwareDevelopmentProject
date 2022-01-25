@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
 
-    @StateObject var kitchen = Kitchen(products: [Product]())
+    @StateObject var kitchen = Kitchen()
     
     var body : some View {
         

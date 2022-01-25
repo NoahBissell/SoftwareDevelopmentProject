@@ -8,9 +8,10 @@
 import SwiftUI
 
 struct RecipeView: View {
-    @StateObject var kitchen : Kitchen
+    @ObservedObject var kitchen : Kitchen
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        Text("Hello Worl!")
     }
 }
 

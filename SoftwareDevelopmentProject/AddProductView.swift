@@ -15,7 +15,6 @@ struct AddProductView: View {
     
     @ObservedObject var kitchen : Kitchen
     @State var product : Product = Product()
-    //    @State var classification : Classification = Classification(cleanTitle: "none", category: "none", breadcrumbs: [String]())
     
     @State var scannedCode = "0000"
     @State var isPresentingScanner = false
@@ -49,6 +48,7 @@ struct AddProductView: View {
             Spacer()
             
             // For some reason the keyboard dismisses after typing the first character, can't seem to figure out why
+            // Bug has gone away for me now, will keep this comment for reference
             Form{
                 Section{
                     TextField(
@@ -62,6 +62,7 @@ struct AddProductView: View {
                             }
                         }
                     }
+                    
                 }
                 Section{
                     List(searchedProductList){ productResult in
@@ -78,42 +79,52 @@ struct AddProductView: View {
         }
     }
     
+    var ingredientSheet : some View {
+        Text("placeholder")
+    }
     
     var body: some View {
-        NavigationView{
-            VStack(spacing: 20){
-                Text("Product: \(product.title)")
-                if let unwrappedClassification = product.classification{
-                    Text("Title: \(unwrappedClassification.cleanTitle)")
-                    Text("Category: \(unwrappedClassification.category)")
-                    Text("Breadcrumbs: \(unwrappedClassification.breadcrumbs[0])")
-                }
-                
-                Button("Scan from barcode"){
-                    self.isPresentingScanner = true
-                }
-                .sheet(isPresented: $isPresentingScanner){
-                    scannerSheet
-                }
-                
-                Button("Search for a product"){
-                    self.isPresentingSearch = true
-                }
-                .sheet(isPresented: $isPresentingSearch){
-                    searchSheet
-                }
-                
+        
+        VStack(spacing: 20){
+            Text("Product: \(product.title)")
+            if let unwrappedClassification = product.classification{
+                Text("Title: \(unwrappedClassification.cleanTitle)")
+                Text("Category: \(unwrappedClassification.category)")
             }
-            .toolbar {
-                Button (action: {
-                    kitchen.addProduct(product: product)
-                    self.presentationMode.wrappedValue.dismiss()
-                }, label: {
-                    Text("Add product")
-                })
-                
+            if(product.image != nil){
+                KFImage(product.image)
             }
+//            HStack {
+//                Spacer()
+//                Stepper("Amount: \(product.quantity.value)", value: $product.quantity.value, in: 0...100)
+//                Spacer()
+//            }
+            
+            Button("Scan from barcode"){
+                self.isPresentingScanner = true
+            }
+            .sheet(isPresented: $isPresentingScanner){
+                scannerSheet
+            }
+            
+            Button("Search for a product"){
+                self.isPresentingSearch = true
+            }
+            .sheet(isPresented: $isPresentingSearch){
+                searchSheet
+            }
+            
         }
+        .toolbar {
+            Button (action: {
+                kitchen.addProduct(product: product)
+                self.presentationMode.wrappedValue.dismiss()
+            }, label: {
+                Text("Add product")
+            })
+            
+        }
+        
         
     }
 }
