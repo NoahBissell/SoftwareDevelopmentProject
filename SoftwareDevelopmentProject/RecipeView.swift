@@ -11,7 +11,7 @@ struct RecipeView: View {
     @ObservedObject var kitchen : Kitchen
     
     var body: some View {
-        Text("Hello Worl!")
+        Text("Hello World!")
     }
 }
 

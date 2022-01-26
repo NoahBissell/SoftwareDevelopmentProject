@@ -9,10 +9,14 @@ import SwiftUI
 
 struct KitchenView: View {
     @ObservedObject var kitchen : Kitchen
-    @State var isPresentingAddProduct : Bool = false
+    @State var isAddViewActive = false
+    @State var navigateTo : AnyView?
     
-    func delete(at offsets: IndexSet){
-        kitchen.products.remove(atOffsets: offsets)
+    func deleteProduct(at offsets: IndexSet){
+        kitchen.removeProduct(at: offsets)
+    }
+    func deleteIngredient(at offsets: IndexSet){
+        kitchen.removeIngredient(at: offsets)
     }
     
     var body : some View {
@@ -24,23 +28,45 @@ struct KitchenView: View {
                             ForEach(kitchen.products){ product in
                                 NavigationLink(
                                     destination: ProductView(product: product),
-                                               
+                                    
                                     label: {
-                                    ProductDetail(product: product)
-                                })
+                                        ProductDetail(product: product)
+                                    })
                             }
-                            .onDelete(perform: delete)
+                            .onDelete(perform: deleteProduct)
                         }
                         
+                    }
+                    Section(header: Text("Ingredients")){
+                        List {
+                            ForEach(kitchen.ingredients){ ingredient in
+                                Text(ingredient.getName())
+                            }
+                            .onDelete(perform: deleteIngredient)
+                        }
                     }
                     
                 }
             }
             .navigationTitle("My Kitchen")
             .toolbar {
-                NavigationLink(destination: AddProductView(kitchen: kitchen)) {
+                Menu {
+                    Button("Add a product") {
+                        navigateTo = AnyView(AddProductView(kitchen: kitchen))
+                        isAddViewActive = true
+                    }
+                    Button("Add an ingredient"){
+                        navigateTo = AnyView(AddIngredientView(kitchen: kitchen))
+                        isAddViewActive = true
+                    }
+                    
+                } label: {
                     Image(systemName: "plus")
                 }
+                .background(
+                    NavigationLink(destination: navigateTo, isActive: $isAddViewActive){
+                    EmptyView()
+                })
                 
             }
         }

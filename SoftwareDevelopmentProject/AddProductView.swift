@@ -18,10 +18,10 @@ struct AddProductView: View {
     
     @State var scannedCode = "0000"
     @State var isPresentingScanner = false
-    @State var isPresentingSearch = false
-    @State var query : String = ""
+    @State var isPresentingProductSearch = false
     @State var searchedProductList = [ProductResult]()
-    
+    @State var query = ""
+    @State var searchedIngredientList = [IngredientResult]()
     
     var scannerSheet : some View {
         CodeScannerView(
@@ -33,7 +33,7 @@ struct AddProductView: View {
                     // convert EAN13 to UPC
                     self.scannedCode.removeFirst()
                     FetchData().getProductFromUPC(upc: scannedCode) { product in
-                        self.product = product
+                        self.product = kitchen.createProduct(product: product)
                     }
                     FetchData().classifyProduct(product: product) { classification in
                         product.classification = classification
@@ -42,7 +42,7 @@ struct AddProductView: View {
             })
     }
     
-    var searchSheet : some View {
+    var productSearchSheet : some View {
         
         VStack{
             Spacer()
@@ -68,9 +68,9 @@ struct AddProductView: View {
                     List(searchedProductList){ productResult in
                         Button(productResult.title ?? "Error Loading Product"){
                             FetchData().getProductFromId(id: productResult.id) { product in
-                                self.product = product
+                                self.product = kitchen.createProduct(product: product)
                             }
-                            self.isPresentingSearch = false
+                            self.isPresentingProductSearch = false
                         }
                     }
                 }
@@ -79,9 +79,7 @@ struct AddProductView: View {
         }
     }
     
-    var ingredientSheet : some View {
-        Text("placeholder")
-    }
+    
     
     var body: some View {
         
@@ -94,11 +92,26 @@ struct AddProductView: View {
             if(product.image != nil){
                 KFImage(product.image)
             }
-//            HStack {
-//                Spacer()
-//                Stepper("Amount: \(product.quantity.value)", value: $product.quantity.value, in: 0...100)
-//                Spacer()
-//            }
+            HStack {
+                Spacer()
+                Stepper {
+                    Text("Amount: \(product.quantity)")
+                } onIncrement: {
+                    if(product.quantity < 25){
+                        if(product.storedQuantity != nil){
+                            product.storedQuantity! += 1
+                        }
+                    }
+                } onDecrement: {
+                    if(product.quantity > 0){
+                        if(product.storedQuantity != nil){
+                            product.storedQuantity! -= 1
+                        }
+                    }
+                }
+                
+                Spacer()
+            }
             
             Button("Scan from barcode"){
                 self.isPresentingScanner = true
@@ -108,24 +121,23 @@ struct AddProductView: View {
             }
             
             Button("Search for a product"){
-                self.isPresentingSearch = true
+                self.isPresentingProductSearch = true
             }
-            .sheet(isPresented: $isPresentingSearch){
-                searchSheet
+            .sheet(isPresented: $isPresentingProductSearch){
+                productSearchSheet
             }
             
         }
         .toolbar {
-            Button (action: {
-                kitchen.addProduct(product: product)
-                self.presentationMode.wrappedValue.dismiss()
-            }, label: {
-                Text("Add product")
-            })
-            
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button (action: {
+                    kitchen.addProduct(product: product)
+                    self.presentationMode.wrappedValue.dismiss()
+                }, label: {
+                    Text("Add product")
+                })
+            }
         }
-        
-        
     }
 }
 

@@ -53,7 +53,7 @@ class FetchData : ObservableObject {
             print("Failed 1")
             return
         }
-
+        
         guard let url = URL(string: "https://api.spoonacular.com/food/products/classify?apiKey=\(apiKey)&locale=en_US") else {
             print("Failed 2")
             return
@@ -78,7 +78,7 @@ class FetchData : ObservableObject {
     }
     
     func searchProducts(query : String, completion: @escaping ([ProductResult]) -> ()){
-        let httpQuery = query.replacingOccurrences(of: " ", with: "+")
+        let httpQuery = query.replacingOccurrences(of: " ", with: "%20")
         guard let url = URL(string: "https://api.spoonacular.com/food/products/search?apiKey=\(apiKey)&query=\(httpQuery)") else {return}
         
         URLSession.shared.dataTask(with: url) { (data, response, errors) in
@@ -115,41 +115,55 @@ class FetchData : ObservableObject {
             guard let data = data else {return}
             
             let decoder = JSONDecoder()
-            if let product = try? decoder.decode(Product.self, from: data){
+            do{
+                let product = try decoder.decode(Product.self, from: data)
                 DispatchQueue.main.async {
                     completion(product)
+                    
                 }
+            }catch let jsonError as NSError {
+                print("JSON decode failed: \(jsonError)")
             }
         }.resume()
     }
     
     func searchIngredients(query : String, completion: @escaping ([IngredientResult]) -> ()){
-        let httpQuery = query.replacingOccurrences(of: " ", with: "+")
+        let httpQuery = query.replacingOccurrences(of: " ", with: "%20")
         guard let url = URL(string: "https://api.spoonacular.com/food/ingredients/search?apiKey=\(apiKey)&query=\(httpQuery)") else {return}
         
         URLSession.shared.dataTask(with: url) { (data, response, errors) in
             guard let data = data else {return}
             
             let decoder = JSONDecoder()
-            if let response = try? decoder.decode(IngredientResponse.self, from: data){
+            do{
+                let response = try decoder.decode(IngredientResponse.self, from: data)
                 DispatchQueue.main.async {
-                    completion(response.ingredients)
+                    completion(response.results)
                 }
+                
+            }
+            catch let jsonError as NSError {
+                print("JSON decode faild: \(jsonError)")
             }
         }.resume()
     }
     
     func getIngredientFromId(id : Int, completion : @escaping (Ingredient) -> ()){
-        guard let url = URL(string: "https://api.spoonacular.com/food/ingredients/\(id)/information?apiKey=\(apiKey)") else {return}
+        guard let url = URL(string: "https://api.spoonacular.com/food/ingredients/\(id)/information?apiKey=\(apiKey)&amount=1") else {return}
         
         URLSession.shared.dataTask(with: url) { (data, response, errors) in
             guard let data = data else {return}
             
             let decoder = JSONDecoder()
-            if let ingredient = try? decoder.decode(Ingredient.self, from: data){
+            do{
+                let ingredient = try decoder.decode(Ingredient.self, from: data)
                 DispatchQueue.main.async {
                     completion(ingredient)
                 }
+            }
+            
+            catch let jsonError as NSError{
+                print("JSON decode faild: \(jsonError)")
             }
         }.resume()
     }
@@ -158,6 +172,7 @@ class FetchData : ObservableObject {
 struct StringObject : Codable {
     var title : String
 }
+
 
 // RECIPE STUFF
 struct RecipeResult : Codable, Identifiable {
@@ -175,6 +190,7 @@ struct Recipe : Codable, Identifiable {
     
 }
 
+
 // PRODUCT STUFF
 struct ProductResult : Codable, Identifiable {
     var title : String?
@@ -185,11 +201,36 @@ struct ProductResponse : Codable {
 }
 struct Product : Codable, Identifiable {
     var id : Int = 0
-    var aisle : String?
-    var title : String = "Apples"
+    var title : String = "None"
+    var breadcrumbs : [String]?
+    //    var imageType : String?
     var image : URL?
-    // from classification
+    //    var badges : [String]?
+    //    var importantBadges : [String]?
+    //    var ingredientCount : Int?
+    //    var generatedText : String?
+    //    var ingredientList : String?
+    //    var ingredients : [Nutrient]?
+    //    var likes : Int?
+    var aisle : String?
+    //    var nutrition : Nutrition?
+    //    var price : Float?
+    //    var servings : Serving?
+    //    var spoonacularScore : Float?
+    
     var classification : Classification?
+    
+    // I have two quantities here because the JSONDecoder was crashing if I made this var not optional
+    // "storedQuantity" is for storing and changing the value, "quantity" is for accessing the value
+    var storedQuantity : Int?
+    init(){
+        storedQuantity = 1
+    }
+    var quantity : Int {
+        get {
+            storedQuantity ?? 0
+        }
+    }
 }
 struct Classification : Codable {
     var cleanTitle : String
@@ -200,41 +241,72 @@ struct Classification : Codable {
 
 //INGREDIENT STUFF
 struct IngredientResult : Codable, Identifiable {
-    var title : String?
+    var name : String?
     var id : Int = 0
     var image : URL?
 }
 struct IngredientResponse : Codable {
-    var ingredients : [IngredientResult] = [IngredientResult]()
+    var results : [IngredientResult] = [IngredientResult]()
 }
 struct Ingredient : Codable, Identifiable {
     var id : Int = 0
-    var title : String?
-    var image : URL?
+    private var name : String = "None"
+    var image : String?
+    var amount : Float = 1
+    var unit : String = ""
+    
+    // accessor for name to make sure it's capitalized
+    func getName() -> String {
+        return name.capitalized
+    }
+    func getImageURL() -> URL? {
+        var url = ""
+        if let str = image {
+            url = "https://spoonacular.com/cdn/ingredients_100x100/\(str)"
+        }
+        return URL(string: url)
+    }
 }
 
 
 class Kitchen : ObservableObject {
     
     @Published var products : [Product]
+    @Published var ingredients : [Ingredient]
     @Published var recipes : [Recipe]
     
-    init(products : [Product] = [Product](), recipes : [Recipe] = [Recipe]()){
+    init(products : [Product] = [Product](), recipes : [Recipe] = [Recipe](), ingredients : [Ingredient] = [Ingredient]()){
         self.products = products
         self.recipes = recipes
-        
+        self.ingredients = ingredients
     }
     
+    // Use this function when initializing a new product in order to make sure storedQuantity is always 1
+    func createProduct(product : Product) -> Product {
+        var returnProduct = product
+        returnProduct.storedQuantity = 1
+        return returnProduct
+    }
     func addProduct(product : Product){
         products.append(product)
     }
+    func removeProduct(at offsets: IndexSet){
+        products.remove(atOffsets: offsets)
+    }
     
-//    func addProducts(product: Product, quantity : Int){
-//        if let num = products[product]{
-//            products.updateValue(num + 1, forKey: product)
-//        }
-//        else{
-//            products[product] = 0
-//        }
-//    }
+    func addIngredient(ingredient : Ingredient){
+        ingredients.append(ingredient)
+    }
+    func removeIngredient(at offsets: IndexSet){
+        ingredients.remove(atOffsets: offsets)
+    }
+    
+    //    func addProducts(product: Product, quantity : Int){
+    //        if let num = products[product]{
+    //            products.updateValue(num + 1, forKey: product)
+    //        }
+    //        else{
+    //            products[product] = 0
+    //        }
+    //    }
 }
