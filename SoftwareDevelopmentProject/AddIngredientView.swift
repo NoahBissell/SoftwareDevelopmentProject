@@ -60,11 +60,9 @@ struct AddIngredientView: View {
             if(ingredient.image != nil){
                 KFImage(ingredient.getImageURL())
             }
-            HStack {
-                Spacer()
-                Stepper("Amount: \(ingredient.amount)", value: $ingredient.amount)
-                Spacer()
-            }
+            
+            Stepper("Amount: \(ingredient.amount)", value: $ingredient.amount)
+            
             
             Button("Search for an ingredient"){
                 self.isPresentingIngredientSearch = true
@@ -73,6 +71,7 @@ struct AddIngredientView: View {
                 ingredientSearchSheet
             }
         }
+        .padding()
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button (action: {
@@ -85,6 +84,7 @@ struct AddIngredientView: View {
         }
     }
 }
+
 
 struct AddIngredientView_Previews: PreviewProvider {
     static var previews: some View {

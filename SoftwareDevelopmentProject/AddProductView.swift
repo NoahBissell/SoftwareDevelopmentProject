@@ -52,7 +52,7 @@ struct AddProductView: View {
             Form{
                 Section{
                     TextField(
-                        "Search all recipes",
+                        "Search all grocery products",
                         text: $query)
                     
                     if(query.count > 0){
@@ -92,8 +92,7 @@ struct AddProductView: View {
             if(product.image != nil){
                 KFImage(product.image)
             }
-            HStack {
-                Spacer()
+            
                 Stepper {
                     Text("Amount: \(product.quantity)")
                 } onIncrement: {
@@ -109,9 +108,7 @@ struct AddProductView: View {
                         }
                     }
                 }
-                
-                Spacer()
-            }
+            
             
             Button("Scan from barcode"){
                 self.isPresentingScanner = true
@@ -128,6 +125,7 @@ struct AddProductView: View {
             }
             
         }
+        .padding()
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button (action: {

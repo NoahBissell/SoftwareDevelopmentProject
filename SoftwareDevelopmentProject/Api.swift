@@ -17,7 +17,7 @@ class FetchData : ObservableObject {
     let apiKey : String = "6e1210515a994e818b19fb25a2319a23"
     
     
-    func getRecipes(completion: @escaping ([RecipeResult]) -> ()) {
+    func searchRecipes(completion: @escaping ([RecipeResult]) -> ()) {
         guard let url = URL(string: "https://api.spoonacular.com/recipes/complexSearch?apiKey=\(apiKey)") else {return}
         
         URLSession.shared.dataTask(with: url) { (data, response, errors) in
@@ -262,7 +262,7 @@ struct Ingredient : Codable, Identifiable {
     func getImageURL() -> URL? {
         var url = ""
         if let str = image {
-            url = "https://spoonacular.com/cdn/ingredients_100x100/\(str)"
+            url = "https://spoonacular.com/cdn/ingredients_250x250/\(str)"
         }
         return URL(string: url)
     }
@@ -299,6 +299,13 @@ class Kitchen : ObservableObject {
     }
     func removeIngredient(at offsets: IndexSet){
         ingredients.remove(atOffsets: offsets)
+    }
+    
+    func addRecipe(recipe : Recipe){
+        recipes.append(recipe)
+    }
+    func removeRecipe(at offsets: IndexSet){
+        recipes.remove(atOffsets: offsets)
     }
     
     //    func addProducts(product: Product, quantity : Int){
