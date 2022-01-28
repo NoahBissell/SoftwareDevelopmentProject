@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Kingfisher
 
 struct SavedRecipesView: View {
     @ObservedObject var kitchen : Kitchen
@@ -13,7 +14,19 @@ struct SavedRecipesView: View {
     var body: some View {
         VStack {
             List(kitchen.recipes){ recipe in
-                Text(recipe.title ?? "Error")
+                NavigationLink (destination: {
+                    RecipeView(recipe: recipe, kitchen: kitchen)
+                }, label: {
+                    HStack {
+                        if(recipe.image != nil){
+                            KFImage(recipe.image!)
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                        }
+                        Text(recipe.title ?? "Error")
+                    }
+                })
+
             }
         }
         .navigationTitle("My Cookbook")

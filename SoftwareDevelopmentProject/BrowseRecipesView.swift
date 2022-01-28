@@ -58,7 +58,7 @@ struct BrowseRecipesView: View {
                 Section{
                     List(fetchedRecipeList){ recipeResult in
                         NavigationLink {
-                            RecipeView(kitchen: kitchen, recipeResult: recipeResult)
+                            AddRecipeView(kitchen: kitchen, recipeResult: recipeResult)
                         } label: {
                             HStack {
                                 if(recipeResult.image != nil){

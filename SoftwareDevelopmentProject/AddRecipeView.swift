@@ -1,5 +1,5 @@
 //
-//  RecipeView.swift
+//  AddRecipeView.swift
 //  SoftwareDevelopmentProject
 //
 //  Created by Noah Bissell on 1/27/22.
@@ -7,14 +7,14 @@
 
 import SwiftUI
 import Kingfisher
+import RichText
 
-struct RecipeView: View {
+struct AddRecipeView: View {
     @ObservedObject var kitchen : Kitchen
     var recipeResult : RecipeResult
     @State var isSaved = false
+    @State var isRecipeLoaded = false
     @State var recipe = Recipe()
-    
-    
     
     var body: some View {
         ScrollView {
@@ -22,8 +22,26 @@ struct RecipeView: View {
                 KFImage(recipe.image)
                     .resizable()
                     .aspectRatio(contentMode: .fit)
-                Text(recipe.summary?.removeHtmlTags() ?? "Loading...")
-                
+                //                Text(recipe.summary?.removeHtmlTags() ?? "Loading...")
+                if(isRecipeLoaded) {
+                    RichText(html: recipe.summary ?? "Loading...")
+                        .lineHeight(170)
+                        .imageRadius(12)
+                        .fontType(.system)
+                        .colorScheme(.automatic)
+                        .colorImportant(true)
+                        .linkOpenType(.SFSafariView)
+                        .linkColor(ColorSet(light: "#007AFF", dark: "#0A84FF"))
+                        .placeholder {
+                            Text("Loading...")
+                        }
+                }
+                Text("Ready in: ")
+                HStack {
+                    Image(systemName: "clock")
+                    Text("\(recipe.readyInMinutes ?? 45) minutes")
+                        .font(.title)
+                }
             }
             .onAppear {
                 FetchData().getRecipeFromId(id: recipeResult.id) { recipe in
@@ -32,8 +50,9 @@ struct RecipeView: View {
                     isSaved = kitchen.recipes.contains(where: { recipe in
                         return self.recipe.id == recipe.id
                     })
+                    isRecipeLoaded = true
                 }
-
+                
             }
             .padding()
             .toolbar {
@@ -67,8 +86,8 @@ struct RecipeView: View {
     }
 }
 
-struct RecipeView_Previews: PreviewProvider {
+struct AddRecipeView_Previews: PreviewProvider {
     static var previews: some View {
-        RecipeView(kitchen: Kitchen(), recipeResult: RecipeResult())
+        AddRecipeView(kitchen: Kitchen(), recipeResult: RecipeResult())
     }
 }

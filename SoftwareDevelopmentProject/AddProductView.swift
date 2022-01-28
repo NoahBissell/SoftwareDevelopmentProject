@@ -8,7 +8,7 @@
 import SwiftUI
 import CodeScanner
 import AVFoundation
-import struct Kingfisher.KFImage
+import Kingfisher
 
 struct AddProductView: View {
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
@@ -66,7 +66,7 @@ struct AddProductView: View {
                 }
                 Section{
                     List(searchedProductList){ productResult in
-                        Button(productResult.title ?? "Error Loading Product"){
+                        Button (action: {
                             FetchData().getProductFromId(id: productResult.id) { product in
                                 self.product = kitchen.createProduct(product: product)
                                 FetchData().classifyProduct(product: product) { classification in
@@ -74,12 +74,21 @@ struct AddProductView: View {
                                 }
                                 self.isPresentingProductSearch = false
                             }
-                            
-                        }
+                        }, label: {
+                            HStack {
+                                if(productResult.image != nil){
+                                    KFImage(productResult.image!)
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fit)
+                                }
+                                Text(productResult.title ?? "Error loading product")
+                                Image(systemName: "arrow.right")
+                            }
+                        })
+                            .buttonStyle(PlainButtonStyle())
                     }
                 }
             }
-            
         }
     }
     
@@ -132,12 +141,18 @@ struct AddProductView: View {
         .padding()
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                Button (action: {
-                    kitchen.addProduct(product: product)
-                    self.presentationMode.wrappedValue.dismiss()
-                }, label: {
+                if(product.title != "None") {
+                    Button (action: {
+                        kitchen.addProduct(product: product)
+                        self.presentationMode.wrappedValue.dismiss()
+                    }, label: {
+                        Text("Add product")
+                    })
+                }
+                else{
                     Text("Add product")
-                })
+                        .foregroundColor(.gray)
+                }
             }
         }
     }

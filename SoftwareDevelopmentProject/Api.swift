@@ -14,7 +14,7 @@ class FetchData : ObservableObject {
     //b216ab7db3b144f6af3d732e19080f8a
     //6e1210515a994e818b19fb25a2319a23
     //4753c32caf9640faa169ec11b07ad4fd
-    let apiKey : String = "dc7b6320294946cc8ef2be70d8e98db3"
+    let apiKey : String = "6e1210515a994e818b19fb25a2319a23"
     
     
     func searchRecipes(query : String, completion: @escaping ([RecipeResult]) -> ()) {
@@ -59,7 +59,7 @@ class FetchData : ObservableObject {
             ingredientString += "\(ingredient.name.addingPercentEncoding(withAllowedCharacters: CharacterSet.alphanumerics) ?? ingredient.name),"
         }
         ingredientString.removeLast()
-//        ingredientString = ingredientString.replacingOccurrences(of: " ", with: "%20")
+        
         ingredientString = ingredientString.addingPercentEncoding(withAllowedCharacters: []) ?? ingredientString
         print("HERE: \(ingredientString)")
         guard let url = URL(string: "https://api.spoonacular.com/recipes/findByIngredients?apiKey=\(apiKey)&ingredients=\(ingredientString)&ranking=2") else {return}
@@ -248,6 +248,30 @@ struct Recipe : Codable, Identifiable {
     var image : URL?
     var summary : String?
     var readyInMinutes : Int?
+    var instructions : String?
+    var extendedIngredients : [ExtendedIngredient] = [ExtendedIngredient]()
+}
+// for loading ingredients in a recipe
+struct ExtendedIngredient : Codable, Identifiable {
+    var id : Int = 0
+    var name : String = "None"
+    var image : String?
+    var amount : Float = 1
+    var unit : String = ""
+   
+    
+    // accessor for name to make sure it's capitalized
+    func getName() -> String {
+        return name.capitalized
+    }
+    func getImageURL() -> URL? {
+        var url = ""
+        if let str = image {
+            url = "https://spoonacular.com/cdn/ingredients_250x250/\(str)"
+        }
+        return URL(string: url)
+    }
+    
 }
 
 
@@ -255,6 +279,7 @@ struct Recipe : Codable, Identifiable {
 struct ProductResult : Codable, Identifiable {
     var title : String?
     var id : Int = 0
+    var image : URL?
 }
 struct ProductResponse : Codable {
     var products : [ProductResult] = [ProductResult]()
@@ -314,6 +339,7 @@ struct Ingredient : Codable, Identifiable {
     var image : String?
     var amount : Float = 1
     var unit : String = ""
+    var possibleUnits : [String] = [String]()
     
     // accessor for name to make sure it's capitalized
     func getName() -> String {
@@ -403,5 +429,11 @@ extension String {
             .replacingOccurrences(of: "</b>", with: "")
     }
     
-    
 }
+
+//extension String: Identifiable {
+//    public typealias ID = Int
+//    public var id: Int {
+//        return hash
+//    }
+//}

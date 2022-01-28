@@ -16,6 +16,7 @@ struct AddIngredientView: View {
     @State var searchedIngredientList = [IngredientResult]()
     @State var isPresentingIngredientSearch = false
     @State var query : String = ""
+    @State var selectedUnits = ""
     
     var ingredientSearchSheet : some View {
         VStack{
@@ -43,6 +44,7 @@ struct AddIngredientView: View {
                         Button(ingredientResult.name?.capitalized ?? "Error Loading Product"){
                             FetchData().getIngredientFromId(id: ingredientResult.id) { ingredient in
                                 self.ingredient = ingredient
+                                self.ingredient.unit = ingredient.possibleUnits.first ?? ""
                             }
                             self.isPresentingIngredientSearch = false
                         }
@@ -61,8 +63,19 @@ struct AddIngredientView: View {
                 KFImage(ingredient.getImageURL())
             }
             
-            Stepper("Amount: \(ingredient.amount, specifier: "%.2f")", value: $ingredient.amount)
-            
+            Stepper(value: $ingredient.amount, in: 0.1...100.0, step: 0.1) {
+                Text("Amount: \(ingredient.amount, specifier: "%.2f")")
+            }
+
+            HStack{
+                Text("Units: ")
+                Picker("Units", selection: $ingredient.unit) {
+                    ForEach(ingredient.possibleUnits, id: \.self){ unit in
+                        Text(unit)
+                    }
+                }
+                .id(ingredient.possibleUnits)
+            }
             
             Button("Search for an ingredient"){
                 self.isPresentingIngredientSearch = true
@@ -74,12 +87,18 @@ struct AddIngredientView: View {
         .padding()
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                Button (action: {
-                    kitchen.addIngredient(ingredient: ingredient)
-                    self.presentationMode.wrappedValue.dismiss()
-                }, label: {
+                if(ingredient.name != "None"){
+                    Button (action: {
+                        kitchen.addIngredient(ingredient: ingredient)
+                        self.presentationMode.wrappedValue.dismiss()
+                    }, label: {
+                        Text("Add ingredient")
+                    })
+                }
+                else{
                     Text("Add ingredient")
-                })
+                        .foregroundColor(.gray)
+                }
             }
         }
     }
