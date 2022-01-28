@@ -15,7 +15,7 @@ struct ProductDetail: View {
             Text(unwrappedClassification.category)
         }
         else{
-            Text(product.aisle ?? product.title)
+            Text(product.title)
         }
     }
 }

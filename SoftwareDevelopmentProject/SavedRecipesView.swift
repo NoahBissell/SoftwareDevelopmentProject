@@ -11,7 +11,12 @@ struct SavedRecipesView: View {
     @ObservedObject var kitchen : Kitchen
     
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        VStack {
+            List(kitchen.recipes){ recipe in
+                Text(recipe.title ?? "Error")
+            }
+        }
+        .navigationTitle("My Cookbook")
     }
 }
 

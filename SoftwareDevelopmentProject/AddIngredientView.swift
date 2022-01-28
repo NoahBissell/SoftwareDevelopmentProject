@@ -61,7 +61,7 @@ struct AddIngredientView: View {
                 KFImage(ingredient.getImageURL())
             }
             
-            Stepper("Amount: \(ingredient.amount)", value: $ingredient.amount)
+            Stepper("Amount: \(ingredient.amount, specifier: "%.2f")", value: $ingredient.amount)
             
             
             Button("Search for an ingredient"){

@@ -34,9 +34,9 @@ struct AddProductView: View {
                     self.scannedCode.removeFirst()
                     FetchData().getProductFromUPC(upc: scannedCode) { product in
                         self.product = kitchen.createProduct(product: product)
-                    }
-                    FetchData().classifyProduct(product: product) { classification in
-                        product.classification = classification
+                        FetchData().classifyProduct(product: product) { classification in
+                            self.product.classification = classification
+                        }
                     }
                 }
             })
@@ -69,8 +69,12 @@ struct AddProductView: View {
                         Button(productResult.title ?? "Error Loading Product"){
                             FetchData().getProductFromId(id: productResult.id) { product in
                                 self.product = kitchen.createProduct(product: product)
+                                FetchData().classifyProduct(product: product) { classification in
+                                    self.product.classification = classification
+                                }
+                                self.isPresentingProductSearch = false
                             }
-                            self.isPresentingProductSearch = false
+                            
                         }
                     }
                 }

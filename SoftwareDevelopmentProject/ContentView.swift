@@ -18,12 +18,23 @@ struct ContentView: View {
             
             KitchenView(kitchen: kitchen)
                 .tabItem(){
-                    Text("Kitchen")
+                    if #available(iOS 14.5, *) {
+                        Label("Kitchen", systemImage: "house")
+                            .labelStyle(TitleAndIconLabelStyle())
+                    } else {
+                        Text("Kitchen")
+                    }
                 }
             
-            RecipeView(kitchen: kitchen)
+            CookbookView(kitchen: kitchen)
                 .tabItem(){
-                    Text("Recipes")
+                    if #available(iOS 14.5, *) {
+                        Label("Cookbook", systemImage: "text.book.closed")
+                            .labelStyle(TitleAndIconLabelStyle())
+                    } else {
+                        Text("Cookbook")
+                    }
+                    
                 }
         }
         

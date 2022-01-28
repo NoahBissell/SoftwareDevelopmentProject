@@ -1,5 +1,5 @@
 //
-//  BrowseRecipeView.swift
+//  CookbookView.swift
 //  SoftwareDevelopmentProject
 //
 //  Created by Noah Bissell on 1/22/22.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct RecipeView: View {
+struct CookbookView: View {
     @ObservedObject var kitchen : Kitchen
     
     var body: some View {
@@ -24,8 +24,8 @@ struct RecipeView: View {
     }
 }
 
-struct RecipeView_Previews: PreviewProvider {
+struct CookBookView_Previews: PreviewProvider {
     static var previews: some View {
-        RecipeView(kitchen: Kitchen())
+        CookbookView(kitchen: Kitchen())
     }
 }

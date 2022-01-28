@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Kingfisher
 
 struct BrowseRecipesView: View {
     @ObservedObject var kitchen : Kitchen
@@ -17,6 +18,7 @@ struct BrowseRecipesView: View {
     private enum SearchMode : String, CaseIterable, Identifiable {
         case search
         case random
+        case filterIngredients
         
         var id : String { self.rawValue}
     }
@@ -32,7 +34,7 @@ struct BrowseRecipesView: View {
                         
                         if(query.count > 0){
                             Button("Search"){
-                                FetchData().searchRecipes() { recipeList in
+                                FetchData().searchRecipes(query: query) { recipeList in
                                     self.fetchedRecipeList = recipeList
                                 }
                             }
@@ -40,15 +42,33 @@ struct BrowseRecipesView: View {
                     }
                     else{
                         Button("Generate Recipes"){
-                            FetchData().searchRecipes() { recipeList in
-                                self.fetchedRecipeList = recipeList
+                            if(searchMode == .random) {
+                                FetchData().getRandomRecipes { recipeList in
+                                    self.fetchedRecipeList = recipeList
+                                }
+                            }
+                            else {
+                                FetchData().getRecipesFromIngredients(ingredients: kitchen.ingredients) { recipeList in
+                                    self.fetchedRecipeList = recipeList
+                                }
                             }
                         }
                     }
                 }
                 Section{
                     List(fetchedRecipeList){ recipeResult in
-                        Text(recipeResult.title ?? "Error loading recipe")
+                        NavigationLink {
+                            RecipeView(kitchen: kitchen, recipeResult: recipeResult)
+                        } label: {
+                            HStack {
+                                if(recipeResult.image != nil){
+                                    KFImage(recipeResult.image)
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fit)
+                                }
+                                Text(recipeResult.title ?? "Error loading recipe")
+                            }
+                        }
                     }
                 }
             }
@@ -60,23 +80,25 @@ struct BrowseRecipesView: View {
                         Text("Browsing mode")
                        , content: {
                     ForEach(SearchMode.allCases){ mode in
-                        Text(mode.rawValue.capitalized)
+                        Text(mode.rawValue.titleCase())
                             .tag(mode)
                         
                     }
                 })
                     .pickerStyle(SegmentedPickerStyle())
             }
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Toggle("Ingredient filter", isOn: $ingredientFilter)
-                    .toggleStyle(.switch)
-            }
+            //            ToolbarItem(placement: .navigationBarTrailing) {
+            //                Toggle("Ingredient filter", isOn: $ingredientFilter)
+            //                    .toggleStyle(.switch)
+            //            }
         }
     }
 }
+
 
 struct BrowseRecipesView_Previews: PreviewProvider {
     static var previews: some View {
         BrowseRecipesView(kitchen: Kitchen())
     }
 }
+

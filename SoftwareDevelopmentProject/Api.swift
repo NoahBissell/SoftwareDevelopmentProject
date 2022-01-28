@@ -14,11 +14,14 @@ class FetchData : ObservableObject {
     //b216ab7db3b144f6af3d732e19080f8a
     //6e1210515a994e818b19fb25a2319a23
     //4753c32caf9640faa169ec11b07ad4fd
-    let apiKey : String = "6e1210515a994e818b19fb25a2319a23"
+    let apiKey : String = "dc7b6320294946cc8ef2be70d8e98db3"
     
     
-    func searchRecipes(completion: @escaping ([RecipeResult]) -> ()) {
-        guard let url = URL(string: "https://api.spoonacular.com/recipes/complexSearch?apiKey=\(apiKey)") else {return}
+    func searchRecipes(query : String, completion: @escaping ([RecipeResult]) -> ()) {
+//        let httpQuery = query.replacingOccurrences(of: "%", with: "%25").replacingOccurrences(of: " ", with: "%20")
+        let httpQuery = query.addingPercentEncoding(withAllowedCharacters: CharacterSet.alphanumerics) ?? query
+//        print("HERE: \(httpQuery)")
+        guard let url = URL(string: "https://api.spoonacular.com/recipes/complexSearch?apiKey=\(apiKey)&sort=popularity&query=\(httpQuery)") else {return}
         
         URLSession.shared.dataTask(with: url) { (data, response, errors) in
             guard let data = data else {return}
@@ -28,31 +31,81 @@ class FetchData : ObservableObject {
                 DispatchQueue.main.async {
                     completion(response.results)
                 }
+            }
+        }.resume()
+    }
+    
+    func getRandomRecipes(completion: @escaping ([RecipeResult]) -> ()) {
+        guard let url = URL(string: "https://api.spoonacular.com/recipes/random?apiKey=\(apiKey)&number=10") else {return}
+        
+        URLSession.shared.dataTask(with: url) { (data, response, errors) in
+            guard let data = data else {return}
+            
+            let decoder = JSONDecoder()
+            do{
+                let response = try decoder.decode(RandomRecipeResponse.self, from: data)
+                DispatchQueue.main.async {
+                    completion(response.recipes)
+                }
+            } catch let jsonError as NSError {
+                print("JSON decode failed: \(jsonError)")
             }
         }.resume()
     }
     
     func getRecipesFromIngredients(ingredients: [Ingredient], completion: @escaping ([RecipeResult]) -> ()) {
-        guard let url = URL(string: "https://api.spoonacular.com/recipes/complexSearch?apiKey=\(apiKey)") else {return}
+        var ingredientString = ""
+        for ingredient in ingredients {
+            ingredientString += "\(ingredient.name.addingPercentEncoding(withAllowedCharacters: CharacterSet.alphanumerics) ?? ingredient.name),"
+        }
+        ingredientString.removeLast()
+//        ingredientString = ingredientString.replacingOccurrences(of: " ", with: "%20")
+        ingredientString = ingredientString.addingPercentEncoding(withAllowedCharacters: []) ?? ingredientString
+        print("HERE: \(ingredientString)")
+        guard let url = URL(string: "https://api.spoonacular.com/recipes/findByIngredients?apiKey=\(apiKey)&ingredients=\(ingredientString)&ranking=2") else {return}
         
         URLSession.shared.dataTask(with: url) { (data, response, errors) in
             guard let data = data else {return}
             
             let decoder = JSONDecoder()
-            if let response = try? decoder.decode(RecipeResponse.self, from: data){
+            do{
+                let response = try decoder.decode([RecipeResult].self, from: data)
                 DispatchQueue.main.async {
-                    completion(response.results)
+                    completion(response)
                 }
+            } catch let jsonError as NSError {
+                print("JSON decode failed: \(jsonError)")
+            }
+        }.resume()
+    }
+    
+    func getRecipeFromId(id : Int, completion: @escaping (Recipe) -> ()) {
+        guard let url = URL(string: "https://api.spoonacular.com/recipes/\(id)/information?apiKey=\(apiKey)") else {return}
+        
+        URLSession.shared.dataTask(with: url) { (data, response, errors) in
+            guard let data = data else {return}
+            
+            let decoder = JSONDecoder()
+            do{
+                let recipe = try decoder.decode(Recipe.self, from: data)
+                DispatchQueue.main.async {
+                    completion(recipe)
+                    
+                }
+            }catch let jsonError as NSError {
+                print("JSON decode failed: \(jsonError)")
             }
         }.resume()
     }
     
     func classifyProduct(product : Product, completion: @escaping (Classification) -> ()) {
-        // If you encounter errors, it might be a problem with passing in a product object and not just a wrapped string
-        guard let encoded = try? JSONEncoder().encode(StringObject(title: product.title)) else {
+//        let title = product.title.addingPercentEncoding(withAllowedCharacters: CharacterSet.alphanumerics) ?? product.title
+        guard let encoded = try? JSONEncoder().encode(StringObject(title: product.title))
+        else {
             print("Failed 1")
             return
         }
+//        print("HERE: \(title)")
         
         guard let url = URL(string: "https://api.spoonacular.com/food/products/classify?apiKey=\(apiKey)&locale=en_US") else {
             print("Failed 2")
@@ -69,16 +122,19 @@ class FetchData : ObservableObject {
                 return
             }
             let decoder = JSONDecoder()
-            if let response = try? decoder.decode(Classification.self, from: data){
+            do{
+            let response = try decoder.decode(Classification.self, from: data)
                 DispatchQueue.main.async {
                     completion(response)
                 }
+            } catch let jsonError as NSError {
+                print("JSON decode failed: \(jsonError)")
             }
         }.resume()
     }
     
     func searchProducts(query : String, completion: @escaping ([ProductResult]) -> ()){
-        let httpQuery = query.replacingOccurrences(of: " ", with: "%20")
+        let httpQuery = query.addingPercentEncoding(withAllowedCharacters: CharacterSet.alphanumerics) ?? query
         guard let url = URL(string: "https://api.spoonacular.com/food/products/search?apiKey=\(apiKey)&query=\(httpQuery)") else {return}
         
         URLSession.shared.dataTask(with: url) { (data, response, errors) in
@@ -128,7 +184,7 @@ class FetchData : ObservableObject {
     }
     
     func searchIngredients(query : String, completion: @escaping ([IngredientResult]) -> ()){
-        let httpQuery = query.replacingOccurrences(of: " ", with: "%20")
+        let httpQuery = query.addingPercentEncoding(withAllowedCharacters: CharacterSet.alphanumerics) ?? query
         guard let url = URL(string: "https://api.spoonacular.com/food/ingredients/search?apiKey=\(apiKey)&query=\(httpQuery)") else {return}
         
         URLSession.shared.dataTask(with: url) { (data, response, errors) in
@@ -177,17 +233,21 @@ struct StringObject : Codable {
 // RECIPE STUFF
 struct RecipeResult : Codable, Identifiable {
     var title : String?
+    var image : URL?
     var id : Int = 0
 }
 struct RecipeResponse : Codable {
     var results : [RecipeResult] = [RecipeResult]()
+}
+struct RandomRecipeResponse : Codable {
+    var recipes : [RecipeResult] = [RecipeResult]()
 }
 struct Recipe : Codable, Identifiable {
     var title : String?
     var id : Int = 0
     var image : URL?
     var summary : String?
-    
+    var readyInMinutes : Int?
 }
 
 
@@ -250,7 +310,7 @@ struct IngredientResponse : Codable {
 }
 struct Ingredient : Codable, Identifiable {
     var id : Int = 0
-    private var name : String = "None"
+    var name : String = "None"
     var image : String?
     var amount : Float = 1
     var unit : String = ""
@@ -307,7 +367,7 @@ class Kitchen : ObservableObject {
     func removeRecipe(at offsets: IndexSet){
         recipes.remove(atOffsets: offsets)
     }
-    
+        
     //    func addProducts(product: Product, quantity : Int){
     //        if let num = products[product]{
     //            products.updateValue(num + 1, forKey: product)
@@ -316,4 +376,32 @@ class Kitchen : ObservableObject {
     //            products[product] = 0
     //        }
     //    }
+}
+
+extension String {
+    func titleCase() -> String {
+        return self
+            .replacingOccurrences(of: "([A-Z])",
+                                  with: " $1",
+                                  options: .regularExpression,
+                                  range: range(of: self))
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .capitalized // If input is in llamaCase
+    }
+    func removeHtmlTags() -> String {
+        var str = self
+        if let range = self.range(of: "Try <a"){
+            str.removeSubrange(range.lowerBound..<self.endIndex)
+        }
+        else if let range = self.range(of: "liked <a"){
+            str.removeSubrange(range.lowerBound..<self.endIndex)
+        }
+        else if let range = self.range(of: "<a> href"){
+            str.removeSubrange(range.lowerBound..<self.endIndex)
+        }
+        return str.replacingOccurrences(of: "<b>", with: "")
+            .replacingOccurrences(of: "</b>", with: "")
+    }
+    
+    
 }
