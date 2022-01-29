@@ -13,11 +13,36 @@ struct RecipeView: View {
     @Environment(\.defaultMinListRowHeight) var minRowHeight
     var recipe : Recipe
     @ObservedObject var kitchen : Kitchen
+    @State var isPresentingMakeRecipe = false
+    @State var canMakeRecipe = true
     let columns = [
         GridItem(.flexible()),
         GridItem(.flexible()),
         GridItem(.flexible())
     ]
+    
+//    var makeRecipeSheet : some View {
+//        VStack{
+//            if (!canMakeRecipe){
+//                Text("It looks like you don't have enough ingredients logged in your kitchen to make this recipe.")
+//            }
+//            else{
+//                Text("You have enough ingredients to make this recipe.")
+//            }
+//            Button("Subtract ingredients"){
+//                for extendedIngredient in recipe.extendedIngredients {
+//                    if let index = kitchen.ingredients.firstIndex(where: { ingredient in
+//                        ingredient.id == extendedIngredient.id
+//                    }){
+//                        kitchen.ingredients[index].amount = kitchen.ingredients[index].amount - extendedIngredient.amount
+//                        if(kitchen.ingredients[index].amount < 0){
+//                            kitchen.ingredients.remove(at: index)
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
     
     var body: some View {
         ScrollView {
@@ -99,21 +124,29 @@ struct RecipeView: View {
                                 print(conversion.targetUnit)
                                 kitchen.ingredients[index].amount = conversion.targetAmount
                                 kitchen.ingredients[index].unit = conversion.targetUnit
+                                if(kitchen.ingredients[index].amount < extendedIngredient.amount) {
+                                    canMakeRecipe = false
+                                }
                             }
                         }
                     }
                 }
             })
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    NavigationLink {
-                        CookRecipeView()
-                    } label: {
-                        Text("Make this recipe")
-                    }
-                    
-                }
-            }
+//            .toolbar {
+//                ToolbarItem(placement: .navigationBarTrailing) {
+//                    NavigationLink {
+//                        CookRecipeView()
+//                    } label: {
+//                        Button("Make this recipe"){
+//                            isPresentingMakeRecipe = true
+//                        }
+//                        .sheet(isPresented: $isPresentingMakeRecipe){
+//                            makeRecipeSheet
+//                        }
+//                    }
+//
+//                }
+//            }
         }
     }
 }

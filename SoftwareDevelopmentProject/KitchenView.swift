@@ -25,22 +25,24 @@ struct KitchenView: View {
                 Form{
                     Section(header: Text("All products")){
                         List {
-                            ForEach(kitchen.products){ product in
+                            ForEach(kitchen.products.indices, id: \.self){ index in
                                 NavigationLink(
-                                    destination: ProductView(product: product),
+                                    destination: ProductView(product: $kitchen.products[index]),
                                     
                                     label: {
-                                        ProductDetail(product: product)
+                                        ProductDetail(product: kitchen.products[index])
                                     })
                             }
                             .onDelete(perform: deleteProduct)
                         }
-                        
                     }
                     Section(header: Text("Ingredients")){
                         List {
-                            ForEach(kitchen.ingredients){ ingredient in
-                                Text(ingredient.getName())
+                            ForEach(kitchen.ingredients.indices, id: \.self){ index in
+                                NavigationLink(destination: IngredientView(ingredient: $kitchen.ingredients[index])) {
+                                    Text(kitchen.ingredients[index].getName())
+                                }
+                                
                             }
                             .onDelete(perform: deleteIngredient)
                         }

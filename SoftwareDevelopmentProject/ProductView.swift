@@ -6,16 +6,56 @@
 //
 
 import SwiftUI
+import Kingfisher
 
 struct ProductView: View {
-    var product: Product
+    @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+    @Binding var product: Product
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        
+        VStack(spacing: 20){
+            Text("Product: \(product.title)")
+            if let unwrappedClassification = product.classification{
+//                Text("Title: \(unwrappedClassification.cleanTitle)")
+                Text("Category: \(unwrappedClassification.category)")
+            }
+            if(product.image != nil){
+                KFImage(product.image)
+            }
+            
+                Stepper {
+                    Text("Amount: \(product.quantity)")
+                } onIncrement: {
+                    if(product.quantity < 25){
+                        if(product.storedQuantity != nil){
+                            product.storedQuantity! += 1
+                        }
+                    }
+                } onDecrement: {
+                    if(product.quantity > 0){
+                        if(product.storedQuantity != nil){
+                            product.storedQuantity! -= 1
+                        }
+                    }
+                }
+            
+        }
+        .padding()
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                    Button (action: {
+                        self.presentationMode.wrappedValue.dismiss()
+                    }, label: {
+                        Text("Done")
+                    })
+            }
+        }
     }
 }
 
 struct ProductView_Previews: PreviewProvider {
     static var previews: some View {
-        ProductView(product: Product())
+        ProductView(product: .constant(Product()))
     }
 }
