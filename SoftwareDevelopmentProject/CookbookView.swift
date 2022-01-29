@@ -12,13 +12,15 @@ struct CookbookView: View {
     
     var body: some View {
         NavigationView{
-            VStack{
-                NavigationLink(destination: BrowseRecipesView(kitchen: kitchen), label: {
-                    CardView(image: "BrowseRecipe Image", title: "Browse Recipes", description: "Broaden your horizons by giving some new foods or recipes a try.")
-                })
-                NavigationLink(destination: SavedRecipesView(kitchen: kitchen), label: {
-                    CardView(image: "SavedRecipes Image", title: "Saved Recipes", description: "Open up your old cookbook of favorite recipes.")
-                })
+            ScrollView {
+                VStack{
+                    NavigationLink(destination: BrowseRecipesView(kitchen: kitchen), label: {
+                        CardView(image: "BrowseRecipe Image", title: "Browse Recipes", description: "Broaden your horizons by giving some new foods or recipes a try.")
+                    })
+                    NavigationLink(destination: SavedRecipesView(kitchen: kitchen), label: {
+                        CardView(image: "SavedRecipes Image", title: "Saved Recipes", description: "Open up your old cookbook of favorite recipes.")
+                    })
+                }
             }
         }
     }

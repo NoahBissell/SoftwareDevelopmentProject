@@ -99,7 +99,7 @@ struct AddProductView: View {
         VStack(spacing: 20){
             Text("Product: \(product.title)")
             if let unwrappedClassification = product.classification{
-                Text("Title: \(unwrappedClassification.cleanTitle)")
+//                Text("Title: \(unwrappedClassification.cleanTitle)")
                 Text("Category: \(unwrappedClassification.category)")
             }
             if(product.image != nil){

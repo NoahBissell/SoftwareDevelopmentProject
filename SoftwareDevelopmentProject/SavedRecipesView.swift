@@ -11,25 +11,31 @@ import Kingfisher
 struct SavedRecipesView: View {
     @ObservedObject var kitchen : Kitchen
     
+    func limitDescription(input : String?) -> String {
+        if var str = input {
+            if(str.count > 300) {
+                str = String(str.prefix(upTo: str.index(str.startIndex, offsetBy: 299)))
+            }
+            return "\(str)..."
+        }
+        return ""
+    }
+    
     var body: some View {
+        ScrollView {
         VStack {
-            List(kitchen.recipes){ recipe in
-                NavigationLink (destination: {
+            ForEach(kitchen.recipes){ recipe in
+                NavigationLink (destination:
                     RecipeView(recipe: recipe, kitchen: kitchen)
-                }, label: {
-                    HStack {
-                        if(recipe.image != nil){
-                            KFImage(recipe.image!)
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                        }
-                        Text(recipe.title ?? "Error")
-                    }
+                                , label: {
+                    CardView(image: "", kfImage: recipe.image, title: recipe.title!, description: "")
+//                    limitDescription(input: recipe.summary)
                 })
 
             }
         }
         .navigationTitle("My Cookbook")
+    }
     }
 }
 

@@ -64,7 +64,7 @@ struct AddIngredientView: View {
             }
             
             Stepper(value: $ingredient.amount, in: 0.1...100.0, step: 0.1) {
-                Text("Amount: \(ingredient.amount, specifier: "%.2f")")
+                Text("Amount: \(ingredient.amount, specifier: "%.1f")")
             }
 
             HStack{

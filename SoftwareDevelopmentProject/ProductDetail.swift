@@ -10,11 +10,16 @@ import SwiftUI
 struct ProductDetail: View {
     var product : Product
     var body: some View {
-        if let unwrappedClassification = product.classification
-        {
-            Text(unwrappedClassification.category)
-        }
-        else{
+        VStack{
+            if let unwrappedClassification = product.classification
+            {
+                Text(unwrappedClassification.category.capitalized)
+                    .font(.caption.smallCaps())
+                    .foregroundColor(.gray)
+            }
+//            Text("almonds")
+//                .font(.caption.smallCaps())
+//                .foregroundColor(.gray)
             Text(product.title)
         }
     }

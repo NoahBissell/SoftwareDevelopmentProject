@@ -6,27 +6,36 @@
 //
 
 import SwiftUI
+import Kingfisher
 
 struct CardView: View {
     var image : String
+    var kfImage : URL?
     var title : String
     var description : String
     
     var body: some View {
-        ZStack{
-            Image(image)
-                .resizable()
-                .aspectRatio(contentMode: .fit)
+        VStack{
+            if(kfImage != nil){
+                KFImage(kfImage)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+            }
+            else{
+                Image(image)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+            }
             HStack {
-                VStack (alignment: .center) {
+                VStack (alignment: .leading) {
                     Text(title)
+                        .foregroundColor(.primary)
                         .font(.title)
-                        .foregroundColor(.white)
                         .fontWeight(Font.Weight.heavy)
-//                    Text(description)
-//                        .font(.body)
-//                        .foregroundColor(.white)
-//                        .fontWeight(.bold)
+                    Text(description)
+                        .foregroundColor(.primary)
+                        .font(.caption)
+                        .fontWeight(.thin)
                 }
                 
             }
@@ -34,10 +43,10 @@ struct CardView: View {
             
         }
         .cornerRadius(10)
-//        .overlay(
-//            RoundedRectangle(cornerRadius: 10)
-//                .stroke(Color(.sRGB, red: 150/255, green: 150/255, blue: 150/255, opacity: 0.1),  lineWidth: 1)
-//        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(Color(.sRGB, red: 90/255, green: 90/255, blue: 90/255, opacity: 0.1),  lineWidth: 1)
+        )
         .padding([.top, .horizontal, .bottom])
     }
 }

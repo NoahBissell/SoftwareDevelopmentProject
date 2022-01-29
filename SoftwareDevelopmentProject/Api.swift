@@ -14,7 +14,7 @@ class FetchData : ObservableObject {
     //b216ab7db3b144f6af3d732e19080f8a
     //6e1210515a994e818b19fb25a2319a23
     //4753c32caf9640faa169ec11b07ad4fd
-    let apiKey : String = "6e1210515a994e818b19fb25a2319a23"
+    let apiKey : String = "b216ab7db3b144f6af3d732e19080f8a"
     
     
     func searchRecipes(query : String, completion: @escaping ([RecipeResult]) -> ()) {
@@ -223,6 +223,26 @@ class FetchData : ObservableObject {
             }
         }.resume()
     }
+    
+    func convertUnits(ingredient : String, amount : Float, sourceUnit: String, targetUnit : String, completion : @escaping (IngredientConversion) -> ()) {
+        let ingredientString = ingredient.addingPercentEncoding(withAllowedCharacters: []) ?? ingredient
+        // print("HERE: \(ingredientString)")
+        guard let url = URL(string: "https://api.spoonacular.com/recipes/convert?apiKey=\(apiKey)&ingredientName=\(ingredientString)&sourceAmount=\(amount)&sourceUnit=\(sourceUnit)&targetUnit=\(targetUnit)") else {return}
+        
+        URLSession.shared.dataTask(with: url) { (data, response, errors) in
+            guard let data = data else {return}
+            
+            let decoder = JSONDecoder()
+            do{
+                let response = try decoder.decode(IngredientConversion.self, from: data)
+                DispatchQueue.main.async {
+                    completion(response)
+                }
+            } catch let jsonError as NSError {
+                print("JSON decode failed: \(jsonError)")
+            }
+        }.resume()
+    }
 }
 
 struct StringObject : Codable {
@@ -352,6 +372,12 @@ struct Ingredient : Codable, Identifiable {
         }
         return URL(string: url)
     }
+}
+struct IngredientConversion : Codable {
+    var sourceAmount : Float?
+    var sourceUnit : String
+    var targetAmount : Float
+    var targetUnit : String
 }
 
 
