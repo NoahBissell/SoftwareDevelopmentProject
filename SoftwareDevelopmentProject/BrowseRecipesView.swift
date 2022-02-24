@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-import Kingfisher
+import struct Kingfisher.KFImage
 
 struct BrowseRecipesView: View {
     @ObservedObject var kitchen : Kitchen
@@ -57,9 +57,9 @@ struct BrowseRecipesView: View {
                 }
                 Section{
                     List(fetchedRecipeList){ recipeResult in
-                        NavigationLink {
+                        NavigationLink( destination:
                             AddRecipeView(kitchen: kitchen, recipeResult: recipeResult)
-                        } label: {
+                        , label: {
                             HStack {
                                 if(recipeResult.image != nil){
                                     KFImage(recipeResult.image)
@@ -68,7 +68,7 @@ struct BrowseRecipesView: View {
                                 }
                                 Text(recipeResult.title ?? "Error loading recipe")
                             }
-                        }
+                        })
                     }
                 }
             }

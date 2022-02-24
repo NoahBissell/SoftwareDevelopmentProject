@@ -6,9 +6,8 @@
 //
 
 import SwiftUI
-import CodeScanner
 import AVFoundation
-import Kingfisher
+import struct Kingfisher.KFImage
 
 struct AddProductView: View {
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
@@ -85,7 +84,7 @@ struct AddProductView: View {
                                 Image(systemName: "arrow.right")
                             }
                         })
-                            .buttonStyle(PlainButtonStyle())
+                        .buttonStyle(PlainButtonStyle())
                     }
                 }
             }
@@ -99,28 +98,26 @@ struct AddProductView: View {
         VStack(spacing: 20){
             Text("Product: \(product.title)")
             if let unwrappedClassification = product.classification{
-//                Text("Title: \(unwrappedClassification.cleanTitle)")
+                //                Text("Title: \(unwrappedClassification.cleanTitle)")
                 Text("Category: \(unwrappedClassification.category)")
             }
             if(product.image != nil){
                 KFImage(product.image)
             }
-            
-                Stepper {
-                    Text("Amount: \(product.quantity)")
-                } onIncrement: {
-                    if(product.quantity < 25){
-                        if(product.storedQuantity != nil){
-                            product.storedQuantity! += 1
-                        }
-                    }
-                } onDecrement: {
-                    if(product.quantity > 0){
-                        if(product.storedQuantity != nil){
-                            product.storedQuantity! -= 1
-                        }
+            Stepper("Amount: \(product.quantity)")
+            {
+                if(product.quantity < 25){
+                    if(product.storedQuantity != nil){
+                        product.storedQuantity! += 1
                     }
                 }
+            } onDecrement: {
+                if(product.quantity > 0){
+                    if(product.storedQuantity != nil){
+                        product.storedQuantity! -= 1
+                    }
+                }
+            }
             
             
             Button("Scan from barcode"){

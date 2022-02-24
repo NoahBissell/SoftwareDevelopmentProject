@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-import Kingfisher
+import struct Kingfisher.KFImage
 
 struct ProductView: View {
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
@@ -24,9 +24,8 @@ struct ProductView: View {
                 KFImage(product.image)
             }
             
-                Stepper {
-                    Text("Amount: \(product.quantity)")
-                } onIncrement: {
+                Stepper("Amount: \(product.quantity)")
+                {
                     if(product.quantity < 25){
                         if(product.storedQuantity != nil){
                             product.storedQuantity! += 1

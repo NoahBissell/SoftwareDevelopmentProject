@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-import Kingfisher
+import struct Kingfisher.KFImage
 
 struct SavedRecipesView: View {
     @ObservedObject var kitchen : Kitchen

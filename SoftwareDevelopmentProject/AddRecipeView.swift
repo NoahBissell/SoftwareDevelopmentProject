@@ -6,8 +6,8 @@
 //
 
 import SwiftUI
-import Kingfisher
-import RichText
+import struct Kingfisher.KFImage
+
 
 struct AddRecipeView: View {
     @ObservedObject var kitchen : Kitchen
@@ -31,7 +31,7 @@ struct AddRecipeView: View {
                         .colorScheme(.automatic)
                         .colorImportant(true)
                         .linkOpenType(.SFSafariView)
-                        .linkColor(ColorSet(light: "#007AFF", dark: "#0A84FF"))
+                        //.linkColor(ColorSet(light: "#007AFF", dark: "#0A84FF"))
                         .placeholder {
                             Text("Loading...")
                         }

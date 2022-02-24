@@ -6,8 +6,8 @@
 //
 import Foundation
 import SwiftUI
-import Kingfisher
-import RichText
+import struct Kingfisher.KFImage
+
 
 struct RecipeView: View {
     @Environment(\.defaultMinListRowHeight) var minRowHeight
@@ -53,15 +53,14 @@ struct RecipeView: View {
                 KFImage(recipe.image)
                     .resizable()
                     .aspectRatio(contentMode: .fit)
-                
                 RichText(html: recipe.instructions ?? "")
                     .lineHeight(170)
                     .imageRadius(12)
-                    .fontType(.system)
-                    .colorScheme(.automatic)
+                    //.fontType(Font.system)
+                    //.colorScheme(ColorScheme.automatic)
                     .colorImportant(true)
-                    .linkOpenType(.SFSafariView)
-                    .linkColor(ColorSet(light: "#007AFF", dark: "#0A84FF"))
+                    //.linkOpenType(.SFSafariView)
+                    //.linkColor(ColorSet(light: "#007AFF", dark: "#0A84FF"))
                     .placeholder {
                         Text("Loading...")
                     }
