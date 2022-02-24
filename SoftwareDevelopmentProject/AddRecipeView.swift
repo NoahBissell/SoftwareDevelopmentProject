@@ -55,31 +55,31 @@ struct AddRecipeView: View {
                 
             }
             .padding()
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    if(!isSaved){
-                        Button (action: {
-                            kitchen.addRecipe(recipe: recipe)
-                            isSaved = true
-                        }, label: {
-                            if #available(iOS 14.5, *) {
-                                Label("Save", systemImage: "text.book.closed")
-                                    .labelStyle(TitleAndIconLabelStyle())
-                            } else {
-                                Text("Save")
-                            }
-                        })
-                    }
-                    else{
-                        if #available(iOS 14.5, *) {
-                            Label("Saved", systemImage: "checkmark")
-                                .labelStyle(TitleAndIconLabelStyle())
-                        } else {
-                            Text("Saved")
-                        }
-                    }
-                }
-            }
+            .navigationBarItems(trailing:
+                                    HStack{
+                                        if(!isSaved){
+                                            Button (action: {
+                                                kitchen.addRecipe(recipe: recipe)
+                                                isSaved = true
+                                            }, label: {
+                                                if #available(iOS 14.5, *) {
+                                                    Label("Save", systemImage: "text.book.closed")
+                                                        .labelStyle(TitleAndIconLabelStyle())
+                                                } else {
+                                                    Text("Save")
+                                                }
+                                            })
+                                        }
+                                        else{
+                                            if #available(iOS 14.5, *) {
+                                                Label("Saved", systemImage: "checkmark")
+                                                    .labelStyle(TitleAndIconLabelStyle())
+                                            } else {
+                                                Text("Saved")
+                                            }
+                                        }
+                                    }
+            )
         }
         .navigationTitle(recipeResult.title ?? "")
         .navigationBarTitleDisplayMode(NavigationBarItem.TitleDisplayMode.inline)

@@ -10,6 +10,7 @@ import struct Kingfisher.KFImage
 
 struct AddIngredientView: View {
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+    @Binding var presentView : Bool
     
     @ObservedObject var kitchen : Kitchen
     @State var ingredient = Ingredient()
@@ -90,6 +91,7 @@ struct AddIngredientView: View {
                 if(ingredient.name != "None"){
                     Button (action: {
                         kitchen.addIngredient(ingredient: ingredient)
+                        presentView = false;
                         self.presentationMode.wrappedValue.dismiss()
                     }, label: {
                         Text("Add ingredient")
@@ -107,6 +109,6 @@ struct AddIngredientView: View {
 
 struct AddIngredientView_Previews: PreviewProvider {
     static var previews: some View {
-        AddIngredientView(kitchen: Kitchen())
+        AddIngredientView(presentView: .constant(true), kitchen: Kitchen())
     }
 }

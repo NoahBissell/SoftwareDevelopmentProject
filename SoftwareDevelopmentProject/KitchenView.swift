@@ -54,11 +54,11 @@ struct KitchenView: View {
             .toolbar {
                 Menu {
                     Button("Add a product") {
-                        navigateTo = AnyView(AddProductView(kitchen: kitchen))
+                        navigateTo = AnyView(AddProductView(presentView: $isAddViewActive, kitchen: kitchen))
                         isAddViewActive = true
                     }
                     Button("Add an ingredient"){
-                        navigateTo = AnyView(AddIngredientView(kitchen: kitchen))
+                        navigateTo = AnyView(AddIngredientView(presentView: $isAddViewActive, kitchen: kitchen))
                         isAddViewActive = true
                     }
                     
@@ -67,11 +67,17 @@ struct KitchenView: View {
                 }
                 .background(
                     NavigationLink(destination: navigateTo, isActive: $isAddViewActive){
-                    EmptyView()
-                })
+                        EmptyView()
+                        
+                    }
+//                    .isDetailLink(false)
+                )
+                
                 
             }
+            
         }
+        
     }
 }
 
