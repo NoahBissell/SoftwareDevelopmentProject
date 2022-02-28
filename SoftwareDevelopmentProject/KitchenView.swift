@@ -70,7 +70,6 @@ struct KitchenView: View {
                         EmptyView()
                         
                     }
-//                    .isDetailLink(false)
                 )
                 
                 

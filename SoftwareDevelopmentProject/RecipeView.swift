@@ -21,28 +21,7 @@ struct RecipeView: View {
         GridItem(.flexible())
     ]
     
-//    var makeRecipeSheet : some View {
-//        VStack{
-//            if (!canMakeRecipe){
-//                Text("It looks like you don't have enough ingredients logged in your kitchen to make this recipe.")
-//            }
-//            else{
-//                Text("You have enough ingredients to make this recipe.")
-//            }
-//            Button("Subtract ingredients"){
-//                for extendedIngredient in recipe.extendedIngredients {
-//                    if let index = kitchen.ingredients.firstIndex(where: { ingredient in
-//                        ingredient.id == extendedIngredient.id
-//                    }){
-//                        kitchen.ingredients[index].amount = kitchen.ingredients[index].amount - extendedIngredient.amount
-//                        if(kitchen.ingredients[index].amount < 0){
-//                            kitchen.ingredients.remove(at: index)
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    }
+    
     
     var body: some View {
         ScrollView {
@@ -128,24 +107,39 @@ struct RecipeView: View {
                                 }
                             }
                         }
+                        else{
+                            if(kitchen.ingredients[index].amount < extendedIngredient.amount) {
+                                canMakeRecipe = false
+                            }
+                        }
+                    }
+                    else{
+                        canMakeRecipe = false
+                        print("HERE")
                     }
                 }
             })
-//            .toolbar {
-//                ToolbarItem(placement: .navigationBarTrailing) {
-//                    NavigationLink {
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+//                    NavigationLink(destination:
 //                        CookRecipeView()
-//                    } label: {
+//                    , label: {
 //                        Button("Make this recipe"){
 //                            isPresentingMakeRecipe = true
 //                        }
 //                        .sheet(isPresented: $isPresentingMakeRecipe){
 //                            makeRecipeSheet
 //                        }
-//                    }
-//
-//                }
-//            }
+//                    })
+                    Button("Make this recipe"){
+                        isPresentingMakeRecipe = true
+                    }
+                    .sheet(isPresented: $isPresentingMakeRecipe){
+                        makeRecipeSheet
+                    }
+
+                }
+            }
         }
     }
 }
@@ -153,5 +147,37 @@ struct RecipeView: View {
 struct RecipeView_Previews: PreviewProvider {
     static var previews: some View {
         RecipeView(recipe: Recipe(), kitchen: Kitchen())
+    }
+}
+
+struct MakeRecipeSheet : View {
+    @Binding var canMakeRecipe : Bool
+    
+    
+    var body : some View {
+        VStack{
+            if (!canMakeRecipe){
+                Text("It looks like you don't have enough ingredients logged in your kitchen to make this recipe.")
+            }
+            else if(canMakeRecipe){
+                Text("You have enough ingredients to make this recipe.")
+                Button("Subtract ingredients"){
+                    for extendedIngredient in recipe.extendedIngredients {
+                        if let index = kitchen.ingredients.firstIndex(where: { ingredient in
+                            ingredient.id == extendedIngredient.id
+                        }){
+                            kitchen.ingredients[index].amount = kitchen.ingredients[index].amount - extendedIngredient.amount
+                            if(kitchen.ingredients[index].amount < 0){
+                                kitchen.ingredients.remove(at: index)
+                            }
+                        }
+                    }
+                }
+            }
+            
+        }
+        .onAppear(){
+            print(canMakeRecipe)
+        }
     }
 }
