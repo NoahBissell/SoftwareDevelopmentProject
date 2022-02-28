@@ -135,7 +135,7 @@ struct RecipeView: View {
                         isPresentingMakeRecipe = true
                     }
                     .sheet(isPresented: $isPresentingMakeRecipe){
-                        makeRecipeSheet
+                        //makeRecipeSheet
                     }
 
                 }
@@ -150,34 +150,34 @@ struct RecipeView_Previews: PreviewProvider {
     }
 }
 
-struct MakeRecipeSheet : View {
-    @Binding var canMakeRecipe : Bool
-    
-    
-    var body : some View {
-        VStack{
-            if (!canMakeRecipe){
-                Text("It looks like you don't have enough ingredients logged in your kitchen to make this recipe.")
-            }
-            else if(canMakeRecipe){
-                Text("You have enough ingredients to make this recipe.")
-                Button("Subtract ingredients"){
-                    for extendedIngredient in recipe.extendedIngredients {
-                        if let index = kitchen.ingredients.firstIndex(where: { ingredient in
-                            ingredient.id == extendedIngredient.id
-                        }){
-                            kitchen.ingredients[index].amount = kitchen.ingredients[index].amount - extendedIngredient.amount
-                            if(kitchen.ingredients[index].amount < 0){
-                                kitchen.ingredients.remove(at: index)
-                            }
-                        }
-                    }
-                }
-            }
-            
-        }
-        .onAppear(){
-            print(canMakeRecipe)
-        }
-    }
-}
+//struct MakeRecipeSheet : View {
+//    @Binding var canMakeRecipe : Bool
+//
+//
+//    var body : some View {
+//        VStack{
+//            if (!canMakeRecipe){
+//                Text("It looks like you don't have enough ingredients logged in your kitchen to make this recipe.")
+//            }
+//            else if(canMakeRecipe){
+//                Text("You have enough ingredients to make this recipe.")
+//                Button("Subtract ingredients"){
+//                    for extendedIngredient in recipe.extendedIngredients {
+//                        if let index = kitchen.ingredients.firstIndex(where: { ingredient in
+//                            ingredient.id == extendedIngredient.id
+//                        }){
+//                            kitchen.ingredients[index].amount = kitchen.ingredients[index].amount - extendedIngredient.amount
+//                            if(kitchen.ingredients[index].amount < 0){
+//                                kitchen.ingredients.remove(at: index)
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//
+//        }
+//        .onAppear(){
+//            print(canMakeRecipe)
+//        }
+//    }
+//}
