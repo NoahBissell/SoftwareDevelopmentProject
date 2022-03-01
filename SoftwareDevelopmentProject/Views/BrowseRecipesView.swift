@@ -9,7 +9,7 @@ import SwiftUI
 import struct Kingfisher.KFImage
 
 struct BrowseRecipesView: View {
-    @ObservedObject var kitchen : Kitchen
+    @EnvironmentObject var kitchen : Kitchen
     @State var ingredientFilter = false;
     @State var query = ""
     @State var fetchedRecipeList = [RecipeResult]()
@@ -58,7 +58,7 @@ struct BrowseRecipesView: View {
                 Section{
                     List(fetchedRecipeList){ recipeResult in
                         NavigationLink( destination:
-                            AddRecipeView(kitchen: kitchen, recipeResult: recipeResult)
+                            AddRecipeView(recipeResult: recipeResult)
                         , label: {
                             HStack {
                                 if(recipeResult.image != nil){
@@ -98,7 +98,7 @@ struct BrowseRecipesView: View {
 
 struct BrowseRecipesView_Previews: PreviewProvider {
     static var previews: some View {
-        BrowseRecipesView(kitchen: Kitchen())
+        BrowseRecipesView().environmentObject(Kitchen())
     }
 }
 

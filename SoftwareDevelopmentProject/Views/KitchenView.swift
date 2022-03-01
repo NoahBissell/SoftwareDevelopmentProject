@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct KitchenView: View {
-    @ObservedObject var kitchen : Kitchen
+    @EnvironmentObject var kitchen : Kitchen
     @State var isAddViewActive = false
     @State var navigateTo : AnyView?
     
@@ -54,11 +54,11 @@ struct KitchenView: View {
             .toolbar {
                 Menu {
                     Button("Add a product") {
-                        navigateTo = AnyView(AddProductView(presentView: $isAddViewActive, kitchen: kitchen))
+                        navigateTo = AnyView(AddProductView(presentView: $isAddViewActive))
                         isAddViewActive = true
                     }
                     Button("Add an ingredient"){
-                        navigateTo = AnyView(AddIngredientView(presentView: $isAddViewActive, kitchen: kitchen))
+                        navigateTo = AnyView(AddIngredientView(presentView: $isAddViewActive))
                         isAddViewActive = true
                     }
                     
@@ -82,6 +82,6 @@ struct KitchenView: View {
 
 struct KitchenView_Previews: PreviewProvider {
     static var previews: some View {
-        KitchenView(kitchen: Kitchen())
+        KitchenView().environmentObject(Kitchen())
     }
 }

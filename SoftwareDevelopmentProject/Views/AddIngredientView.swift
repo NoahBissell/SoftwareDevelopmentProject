@@ -12,7 +12,7 @@ struct AddIngredientView: View {
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     @Binding var presentView : Bool
     
-    @ObservedObject var kitchen : Kitchen
+    @EnvironmentObject var kitchen : Kitchen
     @State var ingredient = Ingredient()
     @State var searchedIngredientList = [IngredientResult]()
     @State var isPresentingIngredientSearch = false
@@ -109,6 +109,6 @@ struct AddIngredientView: View {
 
 struct AddIngredientView_Previews: PreviewProvider {
     static var previews: some View {
-        AddIngredientView(presentView: .constant(true), kitchen: Kitchen())
+        AddIngredientView(presentView: .constant(true)).environmentObject(Kitchen())
     }
 }

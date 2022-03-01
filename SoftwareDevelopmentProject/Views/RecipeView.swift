@@ -12,7 +12,7 @@ import struct Kingfisher.KFImage
 struct RecipeView: View {
     @Environment(\.defaultMinListRowHeight) var minRowHeight
     var recipe : Recipe
-    @ObservedObject var kitchen : Kitchen
+    @EnvironmentObject var kitchen : Kitchen
     @State var isPresentingMakeRecipe = false
     @State var canMakeRecipe = true
     let columns = [
@@ -146,7 +146,7 @@ struct RecipeView: View {
 
 struct RecipeView_Previews: PreviewProvider {
     static var previews: some View {
-        RecipeView(recipe: Recipe(), kitchen: Kitchen())
+        RecipeView(recipe: Recipe()).environmentObject(Kitchen())
     }
 }
 

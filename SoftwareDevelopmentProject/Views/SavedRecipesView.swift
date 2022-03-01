@@ -9,7 +9,7 @@ import SwiftUI
 import struct Kingfisher.KFImage
 
 struct SavedRecipesView: View {
-    @ObservedObject var kitchen : Kitchen
+    @EnvironmentObject var kitchen : Kitchen
     
     func limitDescription(input : String?) -> String {
         if var str = input {
@@ -26,7 +26,7 @@ struct SavedRecipesView: View {
         VStack {
             ForEach(kitchen.recipes){ recipe in
                 NavigationLink (destination:
-                    RecipeView(recipe: recipe, kitchen: kitchen)
+                    RecipeView(recipe: recipe)
                                 , label: {
                     CardView(image: "", kfImage: recipe.image, title: recipe.title!, description: "")
 //                    limitDescription(input: recipe.summary)
@@ -41,6 +41,6 @@ struct SavedRecipesView: View {
 
 struct SavedRecipesView_Previews: PreviewProvider {
     static var previews: some View {
-        SavedRecipesView(kitchen: Kitchen())
+        SavedRecipesView().environmentObject(Kitchen())
     }
 }

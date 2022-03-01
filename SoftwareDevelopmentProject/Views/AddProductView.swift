@@ -13,7 +13,7 @@ struct AddProductView: View {
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     @Binding var presentView : Bool
     
-    @ObservedObject var kitchen : Kitchen
+    @EnvironmentObject var kitchen : Kitchen
     @State var product : Product = Product()
     
     @State var scannedCode = "0000"
@@ -160,6 +160,6 @@ struct AddProductView: View {
 
 struct AddProductView_Previews: PreviewProvider {
     static var previews: some View {
-        AddProductView(presentView: .constant(true), kitchen: Kitchen())
+        AddProductView(presentView: .constant(true)).environmentObject(Kitchen())
     }
 }

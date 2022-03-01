@@ -10,7 +10,7 @@ import struct Kingfisher.KFImage
 
 
 struct AddRecipeView: View {
-    @ObservedObject var kitchen : Kitchen
+    @EnvironmentObject var kitchen : Kitchen
     var recipeResult : RecipeResult
     @State var isSaved = false
     @State var isRecipeLoaded = false
@@ -88,6 +88,6 @@ struct AddRecipeView: View {
 
 struct AddRecipeView_Previews: PreviewProvider {
     static var previews: some View {
-        AddRecipeView(kitchen: Kitchen(), recipeResult: RecipeResult())
+        AddRecipeView(recipeResult: RecipeResult()).environmentObject(Kitchen())
     }
 }

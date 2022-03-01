@@ -9,14 +9,14 @@ import SwiftUI
 
 struct ContentView: View {
 
-    @StateObject var kitchen = Kitchen()
+    @EnvironmentObject var kitchen : Kitchen
     
     var body : some View {
         
         
         TabView{
             
-            KitchenView(kitchen: kitchen)
+            KitchenView()
                 .tabItem(){
                     if #available(iOS 14.5, *) {
                         Label("Kitchen", systemImage: "house")
@@ -26,7 +26,7 @@ struct ContentView: View {
                     }
                 }
             
-            CookbookView(kitchen: kitchen)
+            CookbookView()
                 .tabItem(){
                     if #available(iOS 14.5, *) {
                         Label("Cookbook", systemImage: "text.book.closed")
@@ -35,6 +35,15 @@ struct ContentView: View {
                         Text("Cookbook")
                     }
                     
+                }
+            SettingsView()
+                .tabItem(){
+                    if #available(iOS 14.5, *) {
+                        Label("Settings", systemImage: "gear")
+                            .labelStyle(TitleAndIconLabelStyle())
+                    } else {
+                        Text("Settings")
+                    }
                 }
         }
         
@@ -45,6 +54,6 @@ struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        ContentView().environmentObject(Kitchen())
     }
 }

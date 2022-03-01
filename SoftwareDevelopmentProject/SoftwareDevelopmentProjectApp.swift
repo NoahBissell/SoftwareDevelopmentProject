@@ -9,9 +9,14 @@ import SwiftUI
 
 @main
 struct SoftwareDevelopmentProjectApp: App {
+    @StateObject var userInfo = UserInfo()
+    @StateObject var kitchen = Kitchen()
+    
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environmentObject(userInfo)
+                .environmentObject(kitchen)
         }
     }
 }
